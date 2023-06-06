@@ -12,36 +12,29 @@ def is_image_file(filename):
 
 
 class DataLoaderTrain(Dataset):
-    def __init__(self, rgb_dir, film_class='target', img_options=None):
+    def __init__(self, rgb_dir, inp='input', target='target', img_options=None):
         super(DataLoaderTrain, self).__init__()
 
-        inp_files = sorted(os.listdir(os.path.join(rgb_dir, 'input')))
-        tar_files = sorted(os.listdir(os.path.join(rgb_dir, film_class)))
+        inp_files = sorted(os.listdir(os.path.join(rgb_dir, inp)))
+        tar_files = sorted(os.listdir(os.path.join(rgb_dir, target)))
         # mas_files = sorted(os.listdir(os.path.join(rgb_dir, 'mask')))
 
-        self.inp_filenames = [os.path.join(rgb_dir, 'input', x) for x in inp_files if is_image_file(x)]
-        self.tar_filenames = [os.path.join(rgb_dir, film_class, x) for x in tar_files if is_image_file(x)]
+        self.inp_filenames = [os.path.join(rgb_dir, inp, x) for x in inp_files if is_image_file(x)]
+        self.tar_filenames = [os.path.join(rgb_dir, target, x) for x in tar_files if is_image_file(x)]
         # self.mas_filenames = [os.path.join(rgb_dir, 'mask', x) for x in mas_files if is_image_file(x)]
 
         self.img_options = img_options
         self.sizex = len(self.tar_filenames)  # get the size of target
 
         self.transform = A.Compose([
-            # A.RandomSizedCrop(min_max_height=(img_options['h'] / 2, img_options['h']), height=img_options['h'],
-            # width=img_options['w']),
             A.Resize(height=img_options['h'], width=img_options['w']),
             A.HorizontalFlip(p=0.3),
             A.VerticalFlip(p=0.3),
             A.RandomRotate90(p=0.3), ],
             additional_targets={
                 'target': 'image',
-                # 'mask': 'image'
             }
         )
-
-        # self.shadow = A.Compose([
-        #     A.RandomShadow(shadow_roi=(0, 0, 1, 1), num_shadows_upper=10, shadow_dimension=15, p=1)
-        # ])
 
     def __len__(self):
         return self.sizex
@@ -51,21 +44,17 @@ class DataLoaderTrain(Dataset):
 
         inp_path = self.inp_filenames[index_]
         tar_path = self.tar_filenames[index_]
-        # mas_path = self.mas_filenames[index_]
 
-        inp_img = Image.open(inp_path)
-        tar_img = Image.open(tar_path)
-        # mas_img = Image.open(mas_path).convert('RGB')
+        inp_img = Image.open(inp_path).convert('L')
+        tar_img = Image.open(tar_path).convert('L')
 
         inp_img = np.array(inp_img)
         tar_img = np.array(tar_img)
-        # mas_img = np.array(mas_img)
 
         transformed = self.transform(image=inp_img, target=tar_img)
 
         inp_img = F.to_tensor(transformed['image'])
         tar_img = F.to_tensor(transformed['target'])
-        # mas_img = F.to_tensor(transformed['mask'])
 
         filename = os.path.splitext(os.path.split(tar_path)[-1])[0]
 
@@ -73,16 +62,14 @@ class DataLoaderTrain(Dataset):
 
 
 class DataLoaderVal(Dataset):
-    def __init__(self, rgb_dir, film_class='target', img_options=None):
+    def __init__(self, rgb_dir, inp='input', target='target', img_options=None):
         super(DataLoaderVal, self).__init__()
 
-        inp_files = sorted(os.listdir(os.path.join(rgb_dir, 'input')))
-        tar_files = sorted(os.listdir(os.path.join(rgb_dir, film_class)))
-        # mas_files = sorted(os.listdir(os.path.join(rgb_dir, 'mask')))
+        inp_files = sorted(os.listdir(os.path.join(rgb_dir, inp)))
+        tar_files = sorted(os.listdir(os.path.join(rgb_dir, target)))
 
-        self.inp_filenames = [os.path.join(rgb_dir, 'input', x) for x in inp_files if is_image_file(x)]
-        self.tar_filenames = [os.path.join(rgb_dir, film_class, x) for x in tar_files if is_image_file(x)]
-        # self.mas_filenames = [os.path.join(rgb_dir, 'mask', x) for x in mas_files if is_image_file(x)]
+        self.inp_filenames = [os.path.join(rgb_dir, inp, x) for x in inp_files if is_image_file(x)]
+        self.tar_filenames = [os.path.join(rgb_dir, target, x) for x in tar_files if is_image_file(x)]
 
         self.img_options = img_options
         self.sizex = len(self.tar_filenames)  # get the size of target
@@ -91,7 +78,6 @@ class DataLoaderVal(Dataset):
             A.Resize(height=img_options['h'], width=img_options['w']), ],
             additional_targets={
                 'target': 'image',
-                # 'mask': 'image'
             }
         )
 
@@ -103,26 +89,21 @@ class DataLoaderVal(Dataset):
 
         inp_path = self.inp_filenames[index_]
         tar_path = self.tar_filenames[index_]
-        # mas_path = self.mas_filenames[index_]
 
-        inp_img = Image.open(inp_path)
-        tar_img = Image.open(tar_path)
-        # mas_img = Image.open(mas_path).convert('RGB')
+        inp_img = Image.open(inp_path).convert('L')
+        tar_img = Image.open(tar_path).convert('L')
 
         if not self.img_options['ori']:
             inp_img = np.array(inp_img)
             tar_img = np.array(tar_img)
-            # mas_img = np.array(mas_img)
 
             transformed = self.transform(image=inp_img, target=tar_img)
 
             inp_img = transformed['image']
             tar_img = transformed['target']
-            # mas_img = F.to_tensor(transformed['mask'])
 
         inp_img = F.to_tensor(inp_img)
         tar_img = F.to_tensor(tar_img)
-        # mas_img = F.to_tensor(mas_img)
 
         filename = os.path.split(tar_path)[-1]
 

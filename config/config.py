@@ -60,7 +60,8 @@ class Config(object):
 
         self._C.MODEL = CN()
         self._C.MODEL.SESSION = 'LUT'
-        self._C.MODEL.FILM = 'target'
+        self._C.MODEL.INPUT = 'input'
+        self._C.MODEL.TARGET = 'target'
 
         self._C.OPTIM = CN()
         self._C.OPTIM.BATCH_SIZE = 1
