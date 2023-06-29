@@ -76,11 +76,11 @@ class Config(object):
         self._C.TRAINING = CN()
         self._C.TRAINING.VAL_AFTER_EVERY = 3
         self._C.TRAINING.RESUME = False
-        self._C.TRAINING.TRAIN_DIR = 'images_dir/train'
-        self._C.TRAINING.VAL_DIR = 'images_dir/val'
+        self._C.TRAINING.TRAIN_DIR = '../dataset/Jung/train'
+        self._C.TRAINING.VAL_DIR = '../dataset/Jung/test'
         self._C.TRAINING.SAVE_DIR = 'checkpoints'
-        self._C.TRAINING.PS_W = 64
-        self._C.TRAINING.PS_H = 64
+        self._C.TRAINING.PS_W = 512
+        self._C.TRAINING.PS_H = 512
         self._C.TRAINING.ORI = False
 
         self._C.TESTING = CN()
