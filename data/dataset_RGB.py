@@ -45,8 +45,8 @@ class DataLoaderTrain(Dataset):
         inp_path = self.inp_filenames[index_]
         tar_path = self.tar_filenames[index_]
 
-        inp_img = Image.open(inp_path).convert('L')
-        tar_img = Image.open(tar_path).convert('L')
+        inp_img = Image.open(inp_path).convert('RGB')
+        tar_img = Image.open(tar_path).convert('RGB')
 
         inp_img = np.array(inp_img)
         tar_img = np.array(tar_img)
@@ -90,8 +90,8 @@ class DataLoaderVal(Dataset):
         inp_path = self.inp_filenames[index_]
         tar_path = self.tar_filenames[index_]
 
-        inp_img = Image.open(inp_path).convert('L')
-        tar_img = Image.open(tar_path).convert('L')
+        inp_img = Image.open(inp_path).convert('RGB')
+        tar_img = Image.open(tar_path).convert('RGB')
 
         if not self.img_options['ori']:
             inp_img = np.array(inp_img)
