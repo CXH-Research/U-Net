@@ -1,4 +1,5 @@
 import warnings
+import os
 
 from accelerate import Accelerator
 from torch.utils.data import DataLoader
@@ -17,6 +18,7 @@ opt = Config('config.yml')
 
 seed_everything(opt.OPTIM.SEED)
 
+os.makedirs('result', exist_ok=True)
 
 def test():
     accelerator = Accelerator()
