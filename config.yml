@@ -1,29 +1,29 @@
 VERBOSE: True
 
 MODEL:
-  SESSION: 'Task'  # 任务名字
+  SESSION: 'UW'  # 任务名字
   INPUT: 'input' # 输入文件夹的名字
   TARGET: 'target' # GT文件夹的名字
 
 # Optimization arguments.
 OPTIM:
-  BATCH_SIZE: 1 # batch size大小
-  NUM_EPOCHS: 300 # 训练轮次
-  LR_INITIAL: 2e-4 # 学习率
+  BATCH_SIZE: 4 
+  NUM_EPOCHS: 200 
+  LR_INITIAL: 2e-4 
   LR_MIN: 1e-6
-  SEED: 3407 # 随机种子
+  SEED: 3407 
   WANDB: False
 
 TRAINING:
-  VAL_AFTER_EVERY: 1 # 测试间隔轮数
+  VAL_AFTER_EVERY: 1 
   RESUME: False
-  PS_W: 512 # 图片宽度，用于改变图片大小
-  PS_H: 512 # 图片高度，用于改变图片大小
-  TRAIN_DIR: '../data/Jung/train/' # 训练数据的路径
-  VAL_DIR: '../data/Jung/test/'    # 测试数据的路径
-  SAVE_DIR: './checkpoints/'     # 存checkpoint的路径
-  ORI: False # 是否使用原分辨率训练
+  PS_W: 256 
+  PS_H: 256 
+  TRAIN_DIR: '../UW/train/' 
+  VAL_DIR: '../UW/test/'    
+  SAVE_DIR: './checkpoints/'     
+  ORI: False 
 
 TESTING:
   WEIGHT: './checkpoints/best.pth'
-  SAVE_IMAGES: True # 是否保存测试图片
+  SAVE_IMAGES: True 
