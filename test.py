@@ -3,7 +3,7 @@ import os
 
 from accelerate import Accelerator
 from torch.utils.data import DataLoader
-from torchmetrics.functional import peak_signal_noise_ratio, mean_squared_error, structural_similarity_index_measure
+from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
 from torchvision.utils import save_image
 from tqdm import tqdm
 
@@ -42,7 +42,6 @@ def test():
     size = len(testloader)
     stat_psnr = 0
     stat_ssim = 0
-    stat_rmse = 0
     for _, test_data in enumerate(tqdm(testloader)):
         # get the inputs; data is a list of [targets, inputs, filename]
         inp = test_data[0].contiguous()
@@ -55,13 +54,11 @@ def test():
 
         stat_psnr += peak_signal_noise_ratio(res, tar, data_range=1)
         stat_ssim += structural_similarity_index_measure(res, tar, data_range=1)
-        stat_rmse += mean_squared_error(torch.mul(res, 255), torch.mul(tar, 255), squared=False)
 
     stat_psnr /= size
     stat_ssim /= size
-    stat_rmse /= size
 
-    print("PSNR: {}, SSIM: {}, RMSE: {}".format(stat_psnr, stat_ssim, stat_rmse))
+    print("PSNR: {}, SSIM: {}".format(stat_psnr, stat_ssim))
 
 
 if __name__ == '__main__':

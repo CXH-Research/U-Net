@@ -4,7 +4,7 @@ import torch.optim as optim
 from accelerate import Accelerator
 from pytorch_msssim import SSIM
 from torch.utils.data import DataLoader
-from torchmetrics.functional import peak_signal_noise_ratio, mean_squared_error, structural_similarity_index_measure
+from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
 from tqdm import tqdm
 
 from config import Config
@@ -58,7 +58,7 @@ def train():
 
     start_epoch = 1
     best_epoch = 1
-    best_rmse = 100
+    best_psnr = 0
     size = len(testloader)
     # training
     for epoch in range(start_epoch, opt.OPTIM.NUM_EPOCHS + 1):
@@ -89,7 +89,6 @@ def train():
             model.eval()
             psnr = 0
             ssim = 0
-            rmse = 0
             for idx, test_data in enumerate(tqdm(testloader)):
                 # get the inputs; data is a list of [targets, inputs, filename]
                 inp = test_data[0].contiguous()
@@ -102,16 +101,14 @@ def train():
 
                 psnr += peak_signal_noise_ratio(res, tar, data_range=1)
                 ssim += structural_similarity_index_measure(res, tar, data_range=1)
-                rmse += mean_squared_error(torch.mul(res, 255), torch.mul(tar, 255), squared=False)
 
             psnr /= size
             ssim /= size
-            rmse /= size
 
-            if rmse < best_rmse:
+            if psnr > best_psnr:
                 # save model
                 best_epoch = epoch
-                best_rmse = rmse
+                best_psnr = psnr
                 save_checkpoint({
                     'state_dict': model.state_dict(),
                 }, epoch, opt.MODEL.SESSION, opt.TRAINING.SAVE_DIR)
@@ -119,12 +116,11 @@ def train():
             accelerator.log({
                 "PSNR": psnr,
                 "SSIM": ssim,
-                "RMSE": rmse
             }, step=epoch)
 
             print(
-                "epoch: {}, PSNR: {}, SSIM: {}, RMSE: {}, best RMSE: {}, best epoch: {}"
-                .format(epoch, psnr, ssim, rmse, best_rmse, best_epoch))
+                "epoch: {}, PSNR: {}, SSIM: {}, best PSNR: {}, best epoch: {}"
+                .format(epoch, psnr, ssim, best_psnr, best_epoch))
 
     accelerator.end_training()
 
