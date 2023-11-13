@@ -111,14 +111,15 @@ def train():
                     'state_dict': model.state_dict(),
                 }, epoch, opt.MODEL.SESSION, opt.TRAINING.SAVE_DIR)
 
-            accelerator.log({
-                "PSNR": psnr,
-                "SSIM": ssim,
-            }, step=epoch)
+            if accelerator.is_local_main_process:
+                accelerator.log({
+                    "PSNR": psnr,
+                    "SSIM": ssim,
+                }, step=epoch)
 
-            print(
-                "epoch: {}, PSNR: {}, SSIM: {}, best PSNR: {}, best epoch: {}"
-                .format(epoch, psnr, ssim, best_psnr, best_epoch))
+                print(
+                    "epoch: {}, PSNR: {}, SSIM: {}, best PSNR: {}, best epoch: {}"
+                    .format(epoch, psnr, ssim, best_psnr, best_epoch))
 
     accelerator.end_training()
 
