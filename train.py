@@ -18,11 +18,6 @@ opt = Config('config.yml')
 
 seed_everything(opt.OPTIM.SEED)
 
-
-if not os.path.exists(opt.TRAINING.SAVE_DIR):
-    os.makedirs(opt.TRAINING.SAVE_DIR)
-
-
 def train():
     # Accelerate
     accelerator = Accelerator(log_with='wandb') if opt.OPTIM.WANDB else Accelerator()
@@ -31,6 +26,9 @@ def train():
         "dataset": opt.TRAINING.TRAIN_DIR
     }
     accelerator.init_trackers("shadow", config=config)
+
+    if accelerator.is_local_main_process:
+        os.makedirs(opt.TRAINING.SAVE_DIR, exist_ok=True)
 
     # Data Loader
     train_dir = opt.TRAINING.TRAIN_DIR
@@ -64,7 +62,7 @@ def train():
     for epoch in range(start_epoch, opt.OPTIM.NUM_EPOCHS + 1):
         model.train()
 
-        for i, data in enumerate(tqdm(trainloader)):
+        for i, data in enumerate(tqdm(trainloader, disable=not accelerator.is_local_main_process)):
             # get the inputs; data is a list of [target, input, filename]
             inp = data[0].contiguous()
             tar = data[1]
@@ -89,7 +87,7 @@ def train():
             model.eval()
             psnr = 0
             ssim = 0
-            for idx, test_data in enumerate(tqdm(testloader)):
+            for idx, test_data in enumerate(tqdm(testloader, disable=not accelerator.is_local_main_process)):
                 # get the inputs; data is a list of [targets, inputs, filename]
                 inp = test_data[0].contiguous()
                 tar = test_data[1]

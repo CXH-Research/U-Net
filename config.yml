@@ -1,9 +1,9 @@
 VERBOSE: True
 
 MODEL:
-  SESSION: 'UW'  # 任务名字
-  INPUT: 'input' # 输入文件夹的名字
-  TARGET: 'target' # GT文件夹的名字
+  SESSION: 'UW'
+  INPUT: 'input'
+  TARGET: 'target'
 
 # Optimization arguments.
 OPTIM:
